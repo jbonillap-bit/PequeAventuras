@@ -1,6 +1,0 @@
-Opcional: puedes pegar sonidos con estos nombres:
-correcto.mp3
-incorrecto.mp3
-aplausos.mp3
-
-Si no los colocas, la página igual funciona.
