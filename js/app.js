@@ -56,8 +56,39 @@ function openStories(){ hideAll(); $('screenIntro').classList.remove('hidden'); 
 function openGamesMenu(){ hideAll(); $('screenGamesMenu').classList.remove('hidden'); }
 
 function startApp(){ storyIndex=0; questionIndex=0; scores = stories.map(() => ({correct:0,total:0,texts:[]})); showVideo(); }
-function showVideo(){ hideAll(); const s=stories[storyIndex]; $('storyIcon').textContent=s.icon; $('storyTitle').textContent=s.title; $('storyCount').textContent=`Cuento ${storyIndex+1} de ${stories.length}`; $('storyVideo').src=s.video; $('screenVideo').classList.remove('hidden'); }
-function restartVideo(){ $('storyVideo').currentTime=0; $('storyVideo').play().catch(()=>{}); }
+function showVideo() {
+    hideAll();
+
+    const s = stories[storyIndex];
+
+    $('storyIcon').textContent = s.icon;
+    $('storyTitle').textContent = s.title;
+    $('storyCount').textContent = `Cuento ${storyIndex + 1} de ${stories.length}`;
+
+    const video = $('storyVideo');
+
+    // Detener el video actual
+    video.pause();
+
+    // Quitar cualquier source anterior
+    video.removeAttribute("src");
+
+    // Asignar el nuevo video
+    video.src = s.video;
+
+    // Recargar el reproductor
+    video.load();
+
+    // Reiniciar al inicio
+    video.currentTime = 0;
+
+    $('screenVideo').classList.remove('hidden');
+}
+function restartVideo() {
+    const video = $('storyVideo');
+    video.currentTime = 0;
+    video.play().catch(() => {});
+}
 function showQuestion(){ hideAll(); selectedAnswer=null; const s=stories[storyIndex], q=s.questions[questionIndex]; $('progressText').textContent=`Pregunta ${questionIndex+1} de ${s.questions.length}`; $('barFill').style.width=`${((questionIndex+1)/s.questions.length)*100}%`; $('questionText').textContent=q.text; $('questionEmoji').textContent=q.emoji || '❓'; $('answers').innerHTML=''; $('btnCheck').classList.toggle('hidden', q.type==='text'); $('btnContinueText').classList.toggle('hidden', q.type!=='text');
   if(q.type==='choice'){ q.options.forEach((op,i)=>{ const label=document.createElement('label'); label.className='answer-option'; label.innerHTML=`<input type="radio" name="answer" value="${i}"><span>${String.fromCharCode(97+i)}) ${op}</span>`; label.onclick=()=>{selectedAnswer=i; document.querySelectorAll('.answer-option').forEach(x=>x.classList.remove('selected')); label.classList.add('selected');}; $('answers').appendChild(label); }); }
   else { const txt=document.createElement('textarea'); txt.className='text-answer'; txt.id='textResponse'; txt.placeholder='Escribe tu respuesta aquí...'; $('answers').appendChild(txt); }
