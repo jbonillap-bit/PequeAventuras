@@ -1,0 +1,6 @@
+Pega aquí tus videos locales con estos nombres:
+
+1) croco.mp4
+2) alba-mateo.mp4
+
+Si quieres cambiar los nombres, edita js/app.js en la propiedad video.
