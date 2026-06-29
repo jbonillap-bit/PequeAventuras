@@ -89,10 +89,50 @@ function restartVideo() {
     video.currentTime = 0;
     video.play().catch(() => {});
 }
-function showQuestion(){ hideAll(); selectedAnswer=null; const s=stories[storyIndex], q=s.questions[questionIndex]; $('progressText').textContent=`Pregunta ${questionIndex+1} de ${s.questions.length}`; $('barFill').style.width=`${((questionIndex+1)/s.questions.length)*100}%`; $('questionText').textContent=q.text; $('questionEmoji').textContent=q.emoji || '❓'; $('answers').innerHTML=''; $('btnCheck').classList.toggle('hidden', q.type==='text'); $('btnContinueText').classList.toggle('hidden', q.type!=='text');
-  if(q.type==='choice'){ q.options.forEach((op,i)=>{ const label=document.createElement('label'); label.className='answer-option'; label.innerHTML=`<input type="radio" name="answer" value="${i}"><span>${String.fromCharCode(97+i)}) ${op}</span>`; label.onclick=()=>{selectedAnswer=i; document.querySelectorAll('.answer-option').forEach(x=>x.classList.remove('selected')); label.classList.add('selected');}; $('answers').appendChild(label); }); }
-  else { const txt=document.createElement('textarea'); txt.className='text-answer'; txt.id='textResponse'; txt.placeholder='Escribe tu respuesta aquí...'; $('answers').appendChild(txt); }
-  $('screenQuestion').classList.remove('hidden'); }
+function showQuestion(){
+  // Detener video al iniciar preguntas
+  const video = $('storyVideo');
+  if (video) {
+    video.pause();
+    video.currentTime = 0;
+  }
+
+  hideAll();
+  selectedAnswer = null;
+
+  const s = stories[storyIndex], q = s.questions[questionIndex];
+
+  $('progressText').textContent = `Pregunta ${questionIndex+1} de ${s.questions.length}`;
+  $('barFill').style.width = `${((questionIndex+1)/s.questions.length)*100}%`;
+  $('questionText').textContent = q.text;
+  $('questionEmoji').textContent = q.emoji || '❓';
+  $('answers').innerHTML = '';
+
+  $('btnCheck').classList.toggle('hidden', q.type === 'text');
+  $('btnContinueText').classList.toggle('hidden', q.type !== 'text');
+
+  if(q.type === 'choice'){
+    q.options.forEach((op,i)=>{
+      const label = document.createElement('label');
+      label.className = 'answer-option';
+      label.innerHTML = `<input type="radio" name="answer" value="${i}"><span>${String.fromCharCode(97+i)}) ${op}</span>`;
+      label.onclick = ()=>{
+        selectedAnswer = i;
+        document.querySelectorAll('.answer-option').forEach(x=>x.classList.remove('selected'));
+        label.classList.add('selected');
+      };
+      $('answers').appendChild(label);
+    });
+  } else {
+    const txt = document.createElement('textarea');
+    txt.className = 'text-answer';
+    txt.id = 'textResponse';
+    txt.placeholder = 'Escribe tu respuesta aquí...';
+    $('answers').appendChild(txt);
+  }
+
+  $('screenQuestion').classList.remove('hidden');
+}
 function checkAnswer(){ const q=stories[storyIndex].questions[questionIndex]; if(selectedAnswer===null){ alert('Elige una respuesta.'); return; } if(q.type==='choice') scores[storyIndex].total++; if(selectedAnswer===q.correct){ scores[storyIndex].correct++; showFeedback(true); } else showFeedback(false); }
 function continueFromText(){ const val=($('textResponse')?.value || '').trim(); scores[storyIndex].texts.push({question:stories[storyIndex].questions[questionIndex].text, answer:val}); nextStep(); }
 function showFeedback(ok){ hideAll(); if(ok){ $('feedbackEmoji').textContent='🎉😊'; $('feedbackTitle').textContent='¡FELICIDADES!'; $('feedbackText').textContent='¡Muy bien! Respondiste correctamente.'; $('btnNext').classList.remove('hidden'); $('btnRetry').classList.add('hidden'); playSound('soundCorrect'); confetti(); } else { $('feedbackEmoji').textContent='😢'; $('feedbackTitle').textContent='Incorrecto'; $('feedbackText').textContent='Ups... esa no es la respuesta. Inténtalo otra vez.'; $('btnNext').classList.add('hidden'); $('btnRetry').classList.remove('hidden'); playSound('soundWrong'); } $('screenFeedback').classList.remove('hidden'); }
